@@ -2,7 +2,6 @@ import "server-only";
 import { initializeApp, getApps, cert, type App } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
-import { getStorage } from "firebase-admin/storage";
 
 /**
  * Server-side Firebase. FIREBASE_SERVICE_ACCOUNT is the full service-account
@@ -19,15 +18,11 @@ function loadCredentials() {
 
 function getAdminApp(): App {
   if (getApps().length) return getApps()[0];
-  return initializeApp({
-    credential: cert(loadCredentials()),
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  });
+  return initializeApp({ credential: cert(loadCredentials()) });
 }
 
 export const adminAuth = () => getAuth(getAdminApp());
 export const adminDb = () => getFirestore(getAdminApp());
-export const adminBucket = () => getStorage(getAdminApp()).bucket();
 
 /** Emails that automatically get the admin role on first sign-in. */
 export function adminEmails(): string[] {

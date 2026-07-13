@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Download } from "lucide-react";
-import { authedJson } from "@/lib/api";
+import { authedObjectUrl } from "@/lib/api";
 import { useAuth } from "@/context/auth";
 
 /** In-site PDF reader for a purchased course. */
@@ -21,20 +21,30 @@ export default function ReaderPage({ params }: { params: Promise<{ courseId: str
       return;
     }
     if (!user) return;
+    let objUrl: string | null = null;
     let cancelled = false;
-    authedJson<{ url: string }>(`/api/download?courseId=${courseId}`)
-      .then((d) => !cancelled && setUrl(d.url))
+    authedObjectUrl(`/api/download?courseId=${courseId}`)
+      .then((u) => {
+        objUrl = u;
+        if (cancelled) URL.revokeObjectURL(u);
+        else setUrl(u);
+      })
       .catch((e) => !cancelled && setError(e instanceof Error ? e.message : "Failed to load."));
     return () => {
       cancelled = true;
+      if (objUrl) URL.revokeObjectURL(objUrl);
     };
   }, [user, courseId, router]);
 
   const download = async () => {
-    const { url: dl } = await authedJson<{ url: string }>(
-      `/api/download?courseId=${courseId}&mode=download`,
-    );
-    window.open(dl, "_self");
+    const objUrl = await authedObjectUrl(`/api/download?courseId=${courseId}&mode=download`);
+    const a = document.createElement("a");
+    a.href = objUrl;
+    a.download = "course.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(objUrl), 10000);
   };
 
   return (

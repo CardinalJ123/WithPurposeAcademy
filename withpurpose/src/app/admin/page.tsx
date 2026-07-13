@@ -460,6 +460,9 @@ export default function AdminPage() {
                   onChange={(e) => setPdfFile(e.target.files?.[0] ?? null)}
                   className="field file:mr-3 file:rounded-pill file:border-0 file:bg-chip-600 file:px-4 file:py-1.5 file:text-sm file:font-semibold file:text-white"
                 />
+                <p className="mt-1 text-xs text-cream-faint">
+                  Stored in the database. Max 700&nbsp;KB per PDF for now.
+                </p>
               </div>
               <label className="flex items-center gap-2.5 text-sm text-cream-soft">
                 <input

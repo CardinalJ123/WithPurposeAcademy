@@ -46,5 +46,12 @@ service cloud.firestore {
       allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
       allow write: if false; // server only (Admin SDK, via Stripe webhook)
     }
+
+    // Raw PDF bytes (base64) live here. Never read directly by clients — the
+    // /api/download route serves them after an ownership check. Deny all
+    // client access so purchased material can't be read without buying.
+    match /courseFiles/{courseId} {
+      allow read, write: if false; // server only (Admin SDK)
+    }
   }
 }

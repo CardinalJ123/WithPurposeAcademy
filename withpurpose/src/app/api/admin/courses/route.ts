@@ -1,13 +1,28 @@
 import { NextResponse } from "next/server";
-import { adminBucket, adminDb, requireAdmin } from "@/lib/firebase-admin";
+import { adminDb, requireAdmin } from "@/lib/firebase-admin";
+import { MAX_PDF_BYTES } from "@/lib/site";
 
 export const runtime = "nodejs";
 
 const LEVELS = ["Beginner", "Intermediate", "Advanced"];
 
+/** Reads and validates an uploaded PDF from a form field into a Buffer. */
+async function readPdf(pdf: FormDataEntryValue | null) {
+  if (!(pdf instanceof File) || pdf.type !== "application/pdf") {
+    return { error: "Please attach the course PDF." as string };
+  }
+  if (pdf.size > MAX_PDF_BYTES) {
+    return {
+      error: `PDF must be under ${Math.round(MAX_PDF_BYTES / 1024)} KB. For larger files, switch to file storage (see SETUP.md).`,
+    };
+  }
+  return { buffer: Buffer.from(await pdf.arrayBuffer()) };
+}
+
 /**
  * Create a course. Multipart form: title, summary, description, level,
- * priceUsd (dollars, e.g. "49.99"), pages, published, pdf (file).
+ * priceUsd (dollars, e.g. "49.99"), pages, published, pdf (file). The PDF is
+ * stored base64 in courseFiles/{id}, not the course doc.
  */
 export async function POST(req: Request) {
   try {
@@ -21,7 +36,6 @@ export async function POST(req: Request) {
     const priceUsd = Math.round(parseFloat(String(form.get("priceUsd") ?? "0")) * 100);
     const pages = parseInt(String(form.get("pages") ?? "0"), 10) || 0;
     const published = String(form.get("published")) === "true";
-    const pdf = form.get("pdf");
 
     if (title.length < 3) {
       return NextResponse.json({ error: "Title is too short." }, { status: 400 });
@@ -35,21 +49,10 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
-    if (!(pdf instanceof File) || pdf.type !== "application/pdf") {
-      return NextResponse.json({ error: "Please attach the course PDF." }, { status: 400 });
-    }
-    if (pdf.size > 50 * 1024 * 1024) {
-      return NextResponse.json({ error: "PDF must be under 50 MB." }, { status: 400 });
-    }
+    const pdf = await readPdf(form.get("pdf"));
+    if (pdf.error) return NextResponse.json({ error: pdf.error }, { status: 400 });
 
     const ref = adminDb().collection("courses").doc();
-    const pdfPath = `courses/${ref.id}.pdf`;
-    const buffer = Buffer.from(await pdf.arrayBuffer());
-    await adminBucket().file(pdfPath).save(buffer, {
-      contentType: "application/pdf",
-      resumable: false,
-    });
-
     await ref.set({
       id: ref.id,
       title,
@@ -58,9 +61,14 @@ export async function POST(req: Request) {
       level,
       priceUsd,
       pages,
-      pdfPath,
       published,
       createdAt: Date.now(),
+    });
+    await adminDb().collection("courseFiles").doc(ref.id).set({
+      data: pdf.buffer!.toString("base64"),
+      contentType: "application/pdf",
+      size: pdf.buffer!.length,
+      updatedAt: Date.now(),
     });
 
     return NextResponse.json({ ok: true, id: ref.id });
@@ -99,15 +107,16 @@ export async function PATCH(req: Request) {
       patch.priceUsd = cents;
     }
 
-    const pdf = form.get("pdf");
-    if (pdf instanceof File && pdf.size > 0) {
-      if (pdf.type !== "application/pdf") {
-        return NextResponse.json({ error: "Replacement file must be a PDF." }, { status: 400 });
-      }
-      const buffer = Buffer.from(await pdf.arrayBuffer());
-      await adminBucket().file(snap.data()!.pdfPath).save(buffer, {
+    // Replace the PDF only if a new file was supplied.
+    const pdfEntry = form.get("pdf");
+    if (pdfEntry instanceof File && pdfEntry.size > 0) {
+      const pdf = await readPdf(pdfEntry);
+      if (pdf.error) return NextResponse.json({ error: pdf.error }, { status: 400 });
+      await adminDb().collection("courseFiles").doc(id).set({
+        data: pdf.buffer!.toString("base64"),
         contentType: "application/pdf",
-        resumable: false,
+        size: pdf.buffer!.length,
+        updatedAt: Date.now(),
       });
     }
 
@@ -120,7 +129,7 @@ export async function PATCH(req: Request) {
   }
 }
 
-/** Delete a course and its PDF. Body: { id } */
+/** Delete a course and its stored PDF. Body: { id } */
 export async function DELETE(req: Request) {
   try {
     await requireAdmin(req);
@@ -129,9 +138,7 @@ export async function DELETE(req: Request) {
     const snap = await ref.get();
     if (!snap.exists) return NextResponse.json({ error: "Course not found." }, { status: 404 });
 
-    await adminBucket()
-      .file(snap.data()!.pdfPath)
-      .delete({ ignoreNotFound: true });
+    await adminDb().collection("courseFiles").doc(String(id)).delete();
     await ref.delete();
 
     return NextResponse.json({ ok: true });

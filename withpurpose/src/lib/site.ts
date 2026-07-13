@@ -48,11 +48,22 @@ export type Course = {
   level: "Beginner" | "Intermediate" | "Advanced";
   /** Price in USD cents */
   priceUsd: number;
-  /** Storage path of the PDF, e.g. courses/abc.pdf */
-  pdfPath: string;
   pages: number;
   published: boolean;
   createdAt: number;
+};
+
+/**
+ * The PDF bytes for a course, stored base64 in its own document
+ * (courseFiles/{courseId}) so the course doc stays small for the public
+ * catalogue. Firestore's 1 MB/doc limit caps the raw PDF at ~700 KB.
+ */
+export const MAX_PDF_BYTES = 700 * 1024;
+export type CourseFile = {
+  data: string; // base64-encoded PDF
+  contentType: string;
+  size: number; // raw byte length
+  updatedAt: number;
 };
 
 export type Purchase = {

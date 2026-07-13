@@ -17,3 +17,23 @@ export async function authedJson<T = unknown>(input: string, init: RequestInit =
   if (!res.ok) throw new Error(data.error ?? `Request failed (${res.status})`);
   return data;
 }
+
+/**
+ * Fetches a protected binary (e.g. a course PDF) with the auth token and
+ * returns an object URL for it. The caller owns the URL and should
+ * URL.revokeObjectURL() it when done to free memory.
+ */
+export async function authedObjectUrl(input: string) {
+  const res = await authedFetch(input);
+  if (!res.ok) {
+    let msg = `Request failed (${res.status})`;
+    try {
+      msg = (await res.json()).error ?? msg;
+    } catch {
+      /* non-JSON error body */
+    }
+    throw new Error(msg);
+  }
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}

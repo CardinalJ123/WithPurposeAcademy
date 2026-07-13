@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { BookOpen, Download, PartyPopper, LibraryBig } from "lucide-react";
 import { db } from "@/lib/firebase";
-import { authedJson } from "@/lib/api";
+import { authedObjectUrl } from "@/lib/api";
 import type { Purchase } from "@/lib/site";
 import { useAuth } from "@/context/auth";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
@@ -38,13 +38,17 @@ function LibraryInner() {
     );
   }, [user]);
 
-  const download = async (courseId: string) => {
+  const download = async (courseId: string, title: string) => {
     setDownloading(courseId);
     try {
-      const { url } = await authedJson<{ url: string }>(
-        `/api/download?courseId=${courseId}&mode=download`,
-      );
-      window.open(url, "_self");
+      const objUrl = await authedObjectUrl(`/api/download?courseId=${courseId}&mode=download`);
+      const a = document.createElement("a");
+      a.href = objUrl;
+      a.download = `${title.replace(/[^\w \-]/g, "").trim() || "course"}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(objUrl), 10000);
     } catch {
       /* surfaced by button state reset */
     } finally {
@@ -96,7 +100,7 @@ function LibraryInner() {
                     </Link>
                     <button
                       type="button"
-                      onClick={() => download(p.courseId)}
+                      onClick={() => download(p.courseId, p.courseTitle)}
                       disabled={downloading === p.courseId}
                       className="btn-ghost flex-1 px-4 py-2.5 text-sm"
                     >
