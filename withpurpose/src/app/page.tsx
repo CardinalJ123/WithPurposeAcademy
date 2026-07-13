@@ -248,23 +248,26 @@ export default function HomePage() {
             </Reveal>
           </div>
 
-          <RevealGroup className="mt-12 grid gap-6 md:grid-cols-3" stagger={0.1}>
-            {courses === null ? (
-              [...Array(3)].map((_, i) => (
+          {/* Mount the reveal container only once courses have loaded (see
+              the courses page for why — async children never appear if the
+              one-shot reveal fired earlier over skeletons). */}
+          {courses === null ? (
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              {[...Array(3)].map((_, i) => (
                 <div key={i} className="surface h-72 animate-pulse" aria-hidden />
-              ))
-            ) : featured.length ? (
-              featured.map((c, i) => (
+              ))}
+            </div>
+          ) : featured.length ? (
+            <RevealGroup className="mt-12 grid gap-6 md:grid-cols-3" stagger={0.1}>
+              {featured.map((c, i) => (
                 <RevealItem key={c.id} kind="up" as="article">
                   <CourseCard course={c} index={i} owned={owned.has(c.id)} />
                 </RevealItem>
-              ))
-            ) : (
-              <p className="col-span-full text-cream-soft">
-                Courses are being prepared. Check back soon.
-              </p>
-            )}
-          </RevealGroup>
+              ))}
+            </RevealGroup>
+          ) : (
+            <p className="mt-12 text-cream-soft">Courses are being prepared. Check back soon.</p>
+          )}
         </div>
       </section>
 

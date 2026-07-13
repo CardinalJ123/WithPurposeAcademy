@@ -42,21 +42,27 @@ export default function CoursesPage() {
           </p>
         )}
 
-        <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" stagger={0.08}>
-          {courses === null ? (
-            [...Array(6)].map((_, i) => <div key={i} className="surface h-72 animate-pulse" aria-hidden />)
-          ) : courses.length ? (
-            courses.map((c, i) => (
+        {/* Mount the reveal container only once courses have loaded — a
+            RevealGroup with `once` fires its animation a single time, so if
+            it mounts while showing skeletons the real cards (added later)
+            would never be told to appear and stay invisible. */}
+        {courses === null ? (
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="surface h-72 animate-pulse" aria-hidden />
+            ))}
+          </div>
+        ) : courses.length ? (
+          <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" stagger={0.08}>
+            {courses.map((c, i) => (
               <RevealItem key={c.id} kind="up" as="article">
                 <CourseCard course={c} index={i} owned={owned.has(c.id)} />
               </RevealItem>
-            ))
-          ) : (
-            <p className="col-span-full text-cream-soft">
-              Courses are being prepared. Check back soon.
-            </p>
-          )}
-        </RevealGroup>
+            ))}
+          </RevealGroup>
+        ) : (
+          <p className="mt-12 text-cream-soft">Courses are being prepared. Check back soon.</p>
+        )}
       </div>
     </div>
   );

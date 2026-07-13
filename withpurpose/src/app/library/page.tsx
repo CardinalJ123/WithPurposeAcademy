@@ -78,11 +78,17 @@ function LibraryInner() {
           </p>
         )}
 
-        <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" stagger={0.08}>
-          {purchases === null ? (
-            [...Array(3)].map((_, i) => <div key={i} className="surface h-52 animate-pulse" aria-hidden />)
-          ) : purchases.length ? (
-            purchases.map((p) => (
+        {/* Mount the reveal container only once purchases have loaded, so the
+            one-shot reveal fires with the real cards present (not skeletons). */}
+        {purchases === null ? (
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="surface h-52 animate-pulse" aria-hidden />
+            ))}
+          </div>
+        ) : purchases.length ? (
+          <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" stagger={0.08}>
+            {purchases.map((p) => (
               <RevealItem key={p.id} kind="up" as="article">
                 <div className="surface flex h-full flex-col gap-4 p-7">
                   <span className="grid size-11 place-items-center rounded-full border border-gold-500/30 bg-gold-500/10 text-gold-400">
@@ -110,17 +116,17 @@ function LibraryInner() {
                   </div>
                 </div>
               </RevealItem>
-            ))
-          ) : (
-            <div className="surface col-span-full flex flex-col items-center gap-4 p-14 text-center">
-              <LibraryBig className="size-10 text-cream-faint" aria-hidden />
-              <p className="text-cream-soft">Your library is empty so far.</p>
-              <Link href="/courses" className="btn-chip">
-                Browse the catalogue
-              </Link>
-            </div>
-          )}
-        </RevealGroup>
+            ))}
+          </RevealGroup>
+        ) : (
+          <div className="surface mt-12 flex flex-col items-center gap-4 p-14 text-center">
+            <LibraryBig className="size-10 text-cream-faint" aria-hidden />
+            <p className="text-cream-soft">Your library is empty so far.</p>
+            <Link href="/courses" className="btn-chip">
+              Browse the catalogue
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
