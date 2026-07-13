@@ -27,7 +27,16 @@ function friendly(code: string) {
     return "An account with this email already exists. Try signing in.";
   if (code.includes("weak-password")) return "Password must be at least 6 characters.";
   if (code.includes("popup-closed")) return "Google sign-in was cancelled.";
-  return "Something went wrong. Please try again.";
+  if (code.includes("unauthorized-domain"))
+    return "This site's domain isn't authorized in Firebase yet. In Firebase Console, go to Authentication → Settings → Authorized domains and add this domain.";
+  if (code.includes("operation-not-allowed"))
+    return "This sign-in method isn't enabled yet. In Firebase Console, go to Authentication → Sign-in method and enable it.";
+  if (code.includes("api-key-not-valid") || code.includes("invalid-api-key"))
+    return "Firebase isn't configured correctly (invalid API key). Check the NEXT_PUBLIC_FIREBASE_* environment variables.";
+  // Unrecognized error: surface the raw Firebase code instead of a generic
+  // message, so this doesn't need a devtools trip to diagnose next time.
+  const match = code.match(/auth\/[a-z-]+/);
+  return match ? `Something went wrong (${match[0]}). Please try again.` : "Something went wrong. Please try again.";
 }
 
 function LoginInner() {

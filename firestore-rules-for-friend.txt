@@ -1,0 +1,60 @@
+HOW TO USE
+==========
+1. Go to https://console.firebase.google.com and open your Firebase project.
+2. In the left sidebar: Build -> Firestore Database -> Rules tab.
+3. Select all the existing text in the editor and delete it.
+4. Copy everything below the line of dashes and paste it in.
+5. Click "Publish".
+
+----------------------------------------------------------------------
+
+rules_version = '2';
+
+/**
+ * Firestore security rules for With Purpose Academy.
+ *
+ * All writes to users/courses/purchases go through server API routes using
+ * the Admin SDK (which bypasses these rules), so client writes here are
+ * intentionally locked down to reads only, scoped to what each visitor
+ * should legitimately see.
+ */
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Users can read only their own profile; admins can read any profile
+    // (needed for the admin dashboard's live listeners, if used).
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow write: if false; // server only (Admin SDK)
+    }
+
+    // Anyone can read published courses (the catalogue). Unpublished
+    // courses and all fields are still safe to expose since the PDF itself
+    // lives in Storage behind a signed-URL check, not in this document.
+    match /courses/{courseId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if false; // server only (Admin SDK)
+    }
+
+    // A user may read only their own purchase records (to render "My
+    // Library" and check ownership client-side); admins may read all.
+    match /purchases/{purchaseId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow write: if false; // server only (Admin SDK, via Stripe webhook)
+    }
+  }
+}
