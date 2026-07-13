@@ -9,7 +9,7 @@ import { CourseCard } from "@/components/course-card";
 import { useCourses, usePurchases } from "@/hooks/use-courses";
 import { useAuth } from "@/context/auth";
 import { heroDelay } from "@/lib/boot";
-import { site } from "@/lib/site";
+import { site, img } from "@/lib/site";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -99,6 +99,7 @@ export default function HomePage() {
     <>
       {/* ── Hero ── */}
       <section className="relative p-[clamp(0.6rem,1.6vw,1.4rem)]">
+        <div aria-hidden className="hero-fog absolute inset-0" />
         <div className="relative flex min-h-[calc(100svh-2rem)] flex-col justify-center overflow-hidden rounded-[clamp(1.2rem,3vw,2.2rem)] border border-line-soft bg-(image:--grad-dark)">
           <div aria-hidden className="glow-gold absolute inset-x-0 top-0 h-1/2" />
           <div aria-hidden className="glow-red absolute inset-x-0 bottom-0 h-1/2" />
@@ -108,8 +109,8 @@ export default function HomePage() {
             <span className="absolute right-0 bottom-0 text-[20rem]">♥</span>
           </div>
 
-          <div className="container-wp relative grid items-center gap-12 py-28 lg:grid-cols-[1.2fr_1fr]">
-            <div className="flex flex-col items-start gap-6">
+          <div className="container-wp relative grid items-center gap-10 py-[clamp(3rem,8vw,5.5rem)] lg:grid-cols-[1.2fr_1fr]">
+            <div className="flex flex-col items-start gap-5">
               <motion.span
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -194,9 +195,22 @@ export default function HomePage() {
       {/* ── Pillars ── */}
       <section className="section-pad">
         <div className="container-wp">
-          <Reveal kind="blur" as="h2" className="font-display max-w-2xl text-[clamp(1.8rem,3.6vw,2.6rem)] tracking-wide text-cream">
-            The house edge is <span className="text-gold-400">ignorance</span>. We remove it.
-          </Reveal>
+          <div className="grid items-center gap-10 lg:grid-cols-[1.3fr_1fr]">
+            <Reveal kind="blur" as="h2" className="font-display text-[clamp(1.8rem,3.6vw,2.6rem)] tracking-wide text-cream">
+              The house edge is <span className="text-gold-400">ignorance</span>. We remove it.
+            </Reveal>
+            <Reveal kind="right" className="hidden lg:block">
+              <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-line-soft">
+                <Image
+                  src={img.handChips}
+                  alt="A king-ace starting hand next to stacked poker chips on a felt table"
+                  fill
+                  sizes="24rem"
+                  className="object-cover"
+                />
+              </div>
+            </Reveal>
+          </div>
           <RevealGroup className="mt-12 grid gap-6 md:grid-cols-3" stagger={0.12}>
             {pillars.map((p) => (
               <RevealItem key={p.title} kind="up" as="article">
@@ -255,8 +269,12 @@ export default function HomePage() {
       </section>
 
       {/* ── How it works ── */}
-      <section id="how-it-works" className="section-pad">
-        <div className="container-wp">
+      <section id="how-it-works" className="relative section-pad overflow-hidden">
+        <div aria-hidden className="absolute inset-0">
+          <Image src={img.cardScatter} alt="" fill sizes="100vw" className="object-cover opacity-[0.07]" />
+          <div className="absolute inset-0 bg-felt-950/40" />
+        </div>
+        <div className="container-wp relative">
           <Reveal kind="fade" as="span">
             <span className="kicker">How it works</span>
           </Reveal>
@@ -328,7 +346,11 @@ export default function HomePage() {
       <section className="section-pad">
         <div className="container-wp">
           <Reveal kind="scale">
-            <div className="relative overflow-hidden rounded-[2rem] border border-gold-500/20 bg-(image:--grad-dark) p-[clamp(2rem,6vw,4rem)] text-center">
+            <div className="relative overflow-hidden rounded-[2rem] border border-gold-500/20 p-[clamp(2rem,6vw,4rem)] text-center">
+              <div aria-hidden className="absolute inset-0">
+                <Image src={img.chipPile} alt="" fill sizes="100vw" className="object-cover" />
+                <div className="absolute inset-0 bg-felt-950/86" />
+              </div>
               <div aria-hidden className="glow-gold absolute inset-x-0 top-0 h-full" />
               <h2 className="font-display relative mx-auto max-w-2xl text-[clamp(1.7rem,3.5vw,2.6rem)] tracking-wide text-cream">
                 Ready to stop guessing at the table?

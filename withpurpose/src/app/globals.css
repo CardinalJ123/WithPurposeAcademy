@@ -7,32 +7,34 @@
    ============================================================ */
 
 :root {
-  /* Warm charcoal "felt" scale */
-  --felt-950: oklch(15% 0.012 55);
-  --felt-900: oklch(18% 0.014 55);
-  --felt-800: oklch(22% 0.016 55);
-  --felt-700: oklch(28% 0.018 55);
-  --felt-600: oklch(35% 0.02 55);
+  /* True neutral black scale — a hair of cool undertone so it never reads
+     as a dead flat #000, but unmistakably neutral black-on-black, not the
+     warm brown-charcoal this started as. */
+  --felt-950: oklch(8% 0.004 260);
+  --felt-900: oklch(12% 0.004 260);
+  --felt-800: oklch(16% 0.005 260);
+  --felt-700: oklch(22% 0.006 260);
+  --felt-600: oklch(29% 0.007 260);
 
-  /* Poker-chip red */
-  --chip-700: oklch(42% 0.17 27);
-  --chip-600: oklch(48% 0.19 27);
-  --chip-500: oklch(54% 0.2 28);
-  --chip-400: oklch(62% 0.17 29);
+  /* Poker-chip red — deepened toward true crimson, less orange */
+  --chip-700: oklch(40% 0.175 24);
+  --chip-600: oklch(46% 0.195 25);
+  --chip-500: oklch(52% 0.205 25);
+  --chip-400: oklch(60% 0.18 26);
 
-  /* Brass gold */
-  --gold-600: oklch(62% 0.1 80);
-  --gold-500: oklch(70% 0.105 82);
-  --gold-400: oklch(78% 0.09 85);
-  --gold-300: oklch(86% 0.06 88);
+  /* Brass gold — richer and more saturated */
+  --gold-600: oklch(64% 0.13 76);
+  --gold-500: oklch(72% 0.135 78);
+  --gold-400: oklch(80% 0.115 82);
+  --gold-300: oklch(87% 0.075 86);
 
   /* Cream text on dark */
-  --cream: oklch(94% 0.018 85);
-  --cream-soft: oklch(78% 0.02 80);
-  --cream-faint: oklch(62% 0.018 75);
+  --cream: oklch(94% 0.012 85);
+  --cream-soft: oklch(78% 0.014 80);
+  --cream-faint: oklch(60% 0.012 75);
 
-  --line: oklch(32% 0.02 60);
-  --line-soft: oklch(26% 0.018 58);
+  --line: oklch(30% 0.008 260);
+  --line-soft: oklch(22% 0.006 260);
   --white: oklch(100% 0 0);
 
   /* Semantic */
@@ -55,7 +57,7 @@
   --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.3);
   --shadow-md: 0 6px 18px oklch(0% 0 0 / 0.35);
   --shadow-lg: 0 24px 50px oklch(0% 0 0 / 0.5);
-  --shadow-gold: 0 0 0 1px oklch(70% 0.105 82 / 0.25), 0 10px 30px oklch(0% 0 0 / 0.4);
+  --shadow-gold: 0 0 0 1px oklch(72% 0.135 78 / 0.25), 0 10px 30px oklch(0% 0 0 / 0.4);
 }
 
 @theme inline {
@@ -186,12 +188,23 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
   }
 
-  /* Warm gold spotlight for dark sections */
+  /* Warm gold spotlight for dark sections — a clear pop of color against the
+     near-black background, without becoming a wide hazy patch */
   .glow-gold {
-    background: radial-gradient(55% 55% at 50% 0%, oklch(70% 0.105 82 / 0.14), transparent 70%);
+    background: radial-gradient(46% 46% at 50% 0%, oklch(72% 0.135 78 / 0.13), transparent 72%);
   }
   .glow-red {
-    background: radial-gradient(60% 60% at 50% 100%, oklch(48% 0.19 27 / 0.25), transparent 70%);
+    background: radial-gradient(48% 48% at 50% 100%, oklch(46% 0.195 25 / 0.17), transparent 72%);
+  }
+
+  /* Warm halo bleeding out from behind the inset hero card into the
+     near-black page backdrop — gold and chip-red, kept light/airy rather
+     than darkening the page further. */
+  .hero-fog {
+    background:
+      radial-gradient(55% 60% at 15% 0%, oklch(72% 0.135 78 / 0.18), transparent 70%),
+      radial-gradient(50% 55% at 85% 6%, oklch(52% 0.205 25 / 0.15), transparent 70%),
+      radial-gradient(65% 40% at 50% 100%, oklch(72% 0.135 78 / 0.09), transparent 75%);
   }
 
   /* Card surface */
