@@ -11,8 +11,6 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
-import { authedJson } from "@/lib/api";
-import { isValidNic } from "@/lib/validate";
 import { useAuth } from "@/context/auth";
 import { GoogleButton } from "@/components/google-button";
 import { cn } from "@/lib/utils";
@@ -42,10 +40,9 @@ function friendly(code: string) {
 function LoginInner() {
   const router = useRouter();
   const params = useSearchParams();
-  const { user, needsProfile, profileLoaded } = useAuth();
+  const { user, profileLoaded } = useAuth();
   const [mode, setMode] = useState<Mode>(params.get("mode") === "signup" ? "signup" : "signin");
   const [name, setName] = useState("");
-  const [nic, setNic] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -53,12 +50,11 @@ function LoginInner() {
 
   const next = params.get("next") || "/courses";
 
-  // Already signed in? Route forward (or to the NIC step).
+  // Already signed in? Route forward — the auth context provisions the
+  // Firestore profile doc automatically, no separate step needed.
   useEffect(() => {
-    if (user && profileLoaded) {
-      router.replace(needsProfile ? `/complete-profile?next=${encodeURIComponent(next)}` : next);
-    }
-  }, [user, profileLoaded, needsProfile, router, next]);
+    if (user && profileLoaded) router.replace(next);
+  }, [user, profileLoaded, router, next]);
 
   const google = async () => {
     setError("");
@@ -76,10 +72,8 @@ function LoginInner() {
     e.preventDefault();
     setError("");
 
-    if (mode === "signup") {
-      if (name.trim().length < 2) return setError("Please enter your full name.");
-      if (!isValidNic(nic))
-        return setError("Please enter a valid NIC number (9 digits + V/X, or 12 digits).");
+    if (mode === "signup" && name.trim().length < 2) {
+      return setError("Please enter your full name.");
     }
 
     setBusy(true);
@@ -87,11 +81,8 @@ function LoginInner() {
       if (mode === "signup") {
         const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
         await updateProfile(cred.user, { displayName: name.trim() });
-        await authedJson("/api/profile", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: name.trim(), nic }),
-        });
+        // The auth context provisions the Firestore profile doc from
+        // displayName automatically once the sign-in state updates.
       } else {
         await signInWithEmailAndPassword(auth, email.trim(), password);
       }
@@ -149,40 +140,21 @@ function LoginInner() {
 
         <form onSubmit={submit} className="flex flex-col gap-3.5">
           {mode === "signup" && (
-            <>
-              <div>
-                <label htmlFor="lg-name" className="mb-1 block text-sm font-medium text-cream-soft">
-                  Full name
-                </label>
-                <input
-                  id="lg-name"
-                  type="text"
-                  required
-                  autoComplete="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="field"
-                  placeholder="As it appears on your NIC"
-                />
-              </div>
-              <div>
-                <label htmlFor="lg-nic" className="mb-1 block text-sm font-medium text-cream-soft">
-                  NIC number
-                </label>
-                <input
-                  id="lg-nic"
-                  type="text"
-                  required
-                  value={nic}
-                  onChange={(e) => setNic(e.target.value)}
-                  className="field"
-                  placeholder="e.g. 923456789V or 199234567890"
-                />
-                <p className="mt-1 text-xs text-cream-faint">
-                  Used to verify your identity before purchases are enabled.
-                </p>
-              </div>
-            </>
+            <div>
+              <label htmlFor="lg-name" className="mb-1 block text-sm font-medium text-cream-soft">
+                Full name
+              </label>
+              <input
+                id="lg-name"
+                type="text"
+                required
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="field"
+                placeholder="Your full name"
+              />
+            </div>
           )}
 
           <div>

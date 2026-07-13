@@ -7,9 +7,9 @@ import { site } from "@/lib/site";
 export async function POST(req: Request) {
   try {
     const { decoded, userDoc } = await requireUser(req);
-    if (!userDoc || !userDoc.nic) {
+    if (!userDoc) {
       return NextResponse.json(
-        { error: "Complete your profile before purchasing." },
+        { error: "Your profile is still being set up. Please try again in a moment." },
         { status: 403 },
       );
     }

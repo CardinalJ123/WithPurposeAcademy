@@ -19,8 +19,6 @@ type AuthState = {
   profile: UserDoc | null;
   profileLoaded: boolean;
   isAdmin: boolean;
-  /** Signed in but hasn't completed the NIC profile step */
-  needsProfile: boolean;
   logout: () => Promise<void>;
   getToken: () => Promise<string | null>;
 };
@@ -30,7 +28,6 @@ const Ctx = createContext<AuthState>({
   profile: null,
   profileLoaded: false,
   isAdmin: false,
-  needsProfile: false,
   logout: async () => {},
   getToken: async () => null,
 });
@@ -61,12 +58,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsub;
   }, [user]);
 
+  // First sign-in (Google or email/password) has no Firestore profile doc
+  // yet. Provision it automatically from the auth account's own name/email
+  // — no separate "complete your profile" step needed.
+  useEffect(() => {
+    if (!user || !profileLoaded || profile) return;
+    const t = setTimeout(async () => {
+      try {
+        const token = await user.getIdToken();
+        await fetch("/api/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            name: user.displayName || user.email?.split("@")[0] || "Member",
+          }),
+        });
+      } catch {
+        // Best-effort: the onSnapshot listener above will pick up the doc
+        // once it exists; if this attempt fails, the next mount retries.
+      }
+    }, 0);
+    return () => clearTimeout(t);
+  }, [user, profileLoaded, profile]);
+
   const value: AuthState = {
     user,
     profile,
     profileLoaded,
     isAdmin: profile?.role === "admin",
-    needsProfile: !!user && profileLoaded && (!profile || !profile.nic),
     logout: () => signOut(auth),
     getToken: async () => (auth.currentUser ? auth.currentUser.getIdToken() : null),
   };

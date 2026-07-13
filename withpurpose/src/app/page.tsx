@@ -45,7 +45,7 @@ const steps = [
   {
     icon: UserPlus,
     title: "Create your account",
-    body: "Sign up with Google or email. We ask for your NIC number to verify identity.",
+    body: "Sign up with Google or your email address in seconds.",
   },
   {
     icon: BadgeCheck,
@@ -70,8 +70,8 @@ const faqs = [
     a: "No. With Purpose Academy sells educational PDFs about poker strategy. We do not operate games, accept wagers, or handle gambling funds in any way.",
   },
   {
-    q: "Why do you need my NIC number?",
-    a: "We verify each buyer's identity before enabling purchases. It keeps the platform accountable and is only used for verification, never shared.",
+    q: "Why do new accounts need approval?",
+    a: "A quick review before purchases are enabled keeps the platform accountable. Most accounts are approved within a day.",
   },
   {
     q: "How do I receive the course after paying?",

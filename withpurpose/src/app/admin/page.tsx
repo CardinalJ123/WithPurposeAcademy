@@ -277,7 +277,6 @@ export default function AdminPage() {
                 <tr className="border-b border-line-soft text-xs tracking-wide text-cream-faint uppercase">
                   <th className="px-5 py-3.5 font-semibold">Name</th>
                   <th className="px-5 py-3.5 font-semibold">Email</th>
-                  <th className="px-5 py-3.5 font-semibold">NIC</th>
                   <th className="px-5 py-3.5 font-semibold">Status</th>
                   <th className="px-5 py-3.5 font-semibold">Actions</th>
                 </tr>
@@ -289,7 +288,6 @@ export default function AdminPage() {
                       {u.name} {u.role === "admin" && <span className="text-xs text-gold-400">(admin)</span>}
                     </td>
                     <td className="px-5 py-3 text-cream-soft">{u.email}</td>
-                    <td className="px-5 py-3 text-cream-soft tabular">{u.nic}</td>
                     <td className="px-5 py-3">
                       <span
                         className={cn(
@@ -340,7 +338,7 @@ export default function AdminPage() {
                 ))}
                 {data && data.users.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-5 py-8 text-center text-cream-faint">
+                    <td colSpan={4} className="px-5 py-8 text-center text-cream-faint">
                       No users yet.
                     </td>
                   </tr>

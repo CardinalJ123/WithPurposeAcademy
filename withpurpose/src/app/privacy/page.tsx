@@ -15,9 +15,8 @@ export default function PrivacyPage() {
       <h2>1. What we collect</h2>
       <ul>
         <li>
-          <strong>Account data:</strong> your name, email address, National
-          Identity Card (NIC) number, and profile photo (if you sign in with
-          Google).
+          <strong>Account data:</strong> your name, email address, and profile
+          photo (if you sign in with Google).
         </li>
         <li>
           <strong>Purchase data:</strong> which courses you bought, the amount
@@ -32,7 +31,7 @@ export default function PrivacyPage() {
 
       <h2>2. Why we collect it</h2>
       <ul>
-        <li>NIC number and name: identity verification before purchases are enabled, and fraud prevention.</li>
+        <li>Name: personalizing your account and communications.</li>
         <li>Email: sign-in, purchase receipts, and account notifications.</li>
         <li>Purchase history: to unlock your course library and handle refunds.</li>
       </ul>
@@ -40,7 +39,7 @@ export default function PrivacyPage() {
       <h2>3. What we never do</h2>
       <ul>
         <li>We never sell or rent your personal data.</li>
-        <li>We never share your NIC number with third parties, except where the law requires it.</li>
+        <li>We never share your account data with third parties, except where the law requires it.</li>
         <li>We do not run third-party advertising or tracking networks on this site.</li>
       </ul>
 

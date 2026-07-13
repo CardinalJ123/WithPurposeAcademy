@@ -34,7 +34,6 @@ export type UserDoc = {
   uid: string;
   name: string;
   email: string;
-  nic: string;
   photoURL?: string;
   status: UserStatus;
   role: "user" | "admin";

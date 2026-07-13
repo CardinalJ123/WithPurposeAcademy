@@ -28,7 +28,7 @@ export default function TermsPage() {
       <h2>2. Eligibility and accounts</h2>
       <ul>
         <li>You must be at least 18 years old to create an account or purchase our products.</li>
-        <li>You must provide accurate information when registering, including your full name, email address, and National Identity Card (NIC) number, which we use for identity verification.</li>
+        <li>You must provide accurate information when registering, including your full name and email address.</li>
         <li>New accounts are reviewed by our team. Purchasing is enabled only after your account is approved.</li>
         <li>You are responsible for keeping your login credentials secure. Accounts are personal and may not be shared.</li>
       </ul>
@@ -59,7 +59,7 @@ export default function TermsPage() {
       <ul>
         <li>Do not attempt to access material you have not purchased.</li>
         <li>Do not interfere with the operation or security of the website.</li>
-        <li>Do not use the site under a false identity or someone else&rsquo;s NIC.</li>
+        <li>Do not use the site under a false identity or someone else&rsquo;s account.</li>
       </ul>
 
       <h2>7. Responsible play disclaimer</h2>

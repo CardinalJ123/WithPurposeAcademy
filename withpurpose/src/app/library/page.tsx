@@ -14,15 +14,14 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 function LibraryInner() {
   const router = useRouter();
   const params = useSearchParams();
-  const { user, profileLoaded, needsProfile } = useAuth();
+  const { user } = useAuth();
   const [purchases, setPurchases] = useState<Purchase[] | null>(null);
   const [downloading, setDownloading] = useState<string | null>(null);
   const justPurchased = params.get("purchased");
 
   useEffect(() => {
     if (user === null) router.replace("/login?next=/library");
-    if (user && profileLoaded && needsProfile) router.replace("/complete-profile?next=/library");
-  }, [user, profileLoaded, needsProfile, router]);
+  }, [user, router]);
 
   useEffect(() => {
     if (!user) return;

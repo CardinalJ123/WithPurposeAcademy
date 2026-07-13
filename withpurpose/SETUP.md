@@ -1,8 +1,8 @@
 # With Purpose Academy — Setup Guide
 
-A poker-education platform: Google/email sign-up with NIC verification, an
-admin-approval gate, a course catalogue, Stripe checkout, and a private
-library where buyers read or download their purchased PDFs.
+A poker-education platform: Google/email sign-up, an admin-approval gate, a
+course catalogue, Stripe checkout, and a private library where buyers read
+or download their purchased PDFs.
 
 Stack: Next.js (App Router) · Firebase (Auth, Firestore, Storage) · Stripe ·
 Tailwind v4 · Motion · Lenis.
@@ -80,7 +80,7 @@ Visit `http://localhost:3000`.
 ## 5. Create your admin account
 
 1. Add your email to `ADMIN_EMAILS` in `.env.local` before signing up.
-2. Sign up on the site (Google or email) and complete the NIC step.
+2. Sign up on the site (Google or email).
 3. You'll be auto-approved as an admin and see an **Admin** link in the nav.
 4. Visit `/admin` to manage users and courses.
 
@@ -100,9 +100,8 @@ form.
 
 ## 7. How the approval + purchase flow works
 
-1. A visitor signs up with Google or email. Either way, they're prompted for
-   their **full name** and **NIC number** (`/complete-profile` after Google,
-   or inline during email sign-up).
+1. A visitor signs up with Google or email. Either way, a Firestore profile
+   is provisioned automatically from their account name — no extra step.
 2. Their account is created with `status: "pending"`.
 3. An admin reviews and **Approves** them from `/admin` → Users tab.
 4. Only `approved` accounts can start a Stripe Checkout session
@@ -134,7 +133,7 @@ footer of every page:
 
 - **Terms & Conditions** (`/terms`) — explicitly states this is an
   *educational* product, not gambling; no wagers are accepted or held.
-- **Privacy Policy** (`/privacy`) — explains NIC collection and use.
+- **Privacy Policy** (`/privacy`) — explains what account data is collected and how it's used.
 - **Refund Policy** (`/refunds`) — 14-day window, conditions.
 - **Cookie Policy** (`/cookies`) + a cookie consent banner on first visit.
 

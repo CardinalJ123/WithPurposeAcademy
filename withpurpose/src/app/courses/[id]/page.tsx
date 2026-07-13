@@ -15,7 +15,7 @@ import { Reveal } from "@/components/ui/reveal";
 export default function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { user, profile, needsProfile } = useAuth();
+  const { user, profile } = useAuth();
   const { owned } = usePurchases(user?.uid);
   const [course, setCourse] = useState<Course | null | undefined>(undefined);
   const [busy, setBusy] = useState(false);
@@ -38,10 +38,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
     setError("");
     if (!user) {
       router.push(`/login?next=${encodeURIComponent(`/courses/${id}`)}`);
-      return;
-    }
-    if (needsProfile) {
-      router.push(`/complete-profile?next=${encodeURIComponent(`/courses/${id}`)}`);
       return;
     }
     setBusy(true);
