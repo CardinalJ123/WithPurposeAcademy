@@ -396,8 +396,14 @@ export default function AdminPage() {
 
       {/* ── Course form modal ── */}
       {showForm && (
-        <div className="fixed inset-0 z-[700] flex items-start justify-center overflow-y-auto bg-black/70 p-4 pt-16 backdrop-blur-sm">
-          <div className="surface w-full max-w-lg p-7 shadow-(--shadow-lg)">
+        // data-lenis-prevent: the global Lenis smooth-scroll otherwise
+        // hijacks the wheel and this fixed overlay never scrolls, trapping
+        // the taller form (and its submit button) off-screen.
+        <div
+          data-lenis-prevent
+          className="fixed inset-0 z-[700] flex items-start justify-center overflow-y-auto overscroll-contain bg-black/70 p-4 pt-16 backdrop-blur-sm"
+        >
+          <div className="surface my-auto w-full max-w-lg p-7 shadow-(--shadow-lg)">
             <div className="mb-5 flex items-center justify-between">
               <h2 className="font-display text-xl tracking-wide text-cream">
                 {form.id ? "Edit course" : "New course"}

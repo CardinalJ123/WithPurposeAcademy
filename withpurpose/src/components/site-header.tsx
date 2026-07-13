@@ -150,9 +150,13 @@ export function SiteHeader() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: EASE }}
-            className="fixed inset-0 z-[590] flex flex-col justify-center bg-felt-950/97 px-8 backdrop-blur-xl lg:hidden"
+            // data-lenis-prevent + overflow-y-auto so the menu scrolls on
+            // short/landscape screens instead of Lenis trapping it; min-h-full
+            // + justify-center keeps it centred when it fits.
+            data-lenis-prevent
+            className="fixed inset-0 z-[590] overflow-y-auto overscroll-contain bg-felt-950/97 backdrop-blur-xl lg:hidden"
           >
-            <nav aria-label="Mobile">
+            <nav aria-label="Mobile" className="flex min-h-full flex-col justify-center px-8 py-24">
               <ul className="flex flex-col gap-1.5">
                 {[...nav, ...accountLinks].map((item, i) => (
                   <motion.li
